@@ -4,18 +4,23 @@
 #include <WiFiNINA.h>
 #include "sensorDataHandler.h"
 #include "systemConfig.h"
+#include "mqttHandler.h"
 
 /*=== Declarations ===========================================================*/
 Adafruit_BME680 bme; // I2C
 SensorDataHandler sensorHandler(influxdb_host, influxdb_port, influxdb_org, influxdb_bucket, influxdb_token);
 EnvironmentalData envData;
 int sequenceNumber = 0;
+MQTTClient mqtt;
 
 /*=== Private Function Prototypes ============================================*/
+static void mySerialSender(const String &message);
 static void errorMode(String error_message);
 static void errorMode(void);
 static void PresentSensorDataOnSerialInterace(EnvironmentalData envData);
 static void IndicateSuccessfulSetupPhase(void);
+static void messageReceived(String &topic, String &payload);
+static void mySerialSender(const String &message);
 
 /*=== Public Functions =======================================================*/
 void setup()
@@ -43,6 +48,9 @@ void setup()
   if (!sensorHandler.initSensors())
     errorMode("Failed to initialize sensors.");
 
+  mqtt_setup(mqtt, mqtt_broker, mqtt_port, mqtt_username, mqtt_password, messageReceived, mySerialSender);
+  mqtt_subscribe(mqtt, "test/topic");
+
   IndicateSuccessfulSetupPhase();
 }
 
@@ -61,10 +69,29 @@ void loop()
   if (SERIAL)
     PresentSensorDataOnSerialInterace(envData);
 
+  mqtt_loop(mqtt);
+
   delay(10000);
 }
 
 /*=== Private Functions ======================================================*/
+static void mySerialSender(const String &message)
+{
+  if (SERIAL)
+    SERIAL.println(message);
+}
+
+/*-----------------------------------------------------------------*/
+static void messageReceived(String &topic, String &payload)
+{
+  SERIAL.print("Message received in topic: ");
+  SERIAL.println(topic);
+
+  SERIAL.print("Payload: ");
+  SERIAL.println(payload);
+}
+
+/*-----------------------------------------------------------------*/
 static void errorMode(String error_message)
 {
   if (SERIAL)

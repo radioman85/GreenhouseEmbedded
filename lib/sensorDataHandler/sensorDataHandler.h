@@ -1,3 +1,6 @@
+#ifndef SENSORDATAHANDLER_H
+#define SENSORDATAHANDLER_H
+
 #include <Adafruit_Sensor.h>
 #include "Adafruit_BME680.h"
 #include "influxDbHandler.h"
@@ -19,3 +22,5 @@ private:
     float getHumidity();
     float getPressure();
 };
+
+#endif // SENSORDATAHANDLER_H
