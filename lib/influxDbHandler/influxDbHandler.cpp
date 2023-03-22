@@ -5,12 +5,18 @@ InfluxDbHandler::InfluxDbHandler(const char *host, uint16_t port, const char *or
 {
 }
 
+int16_t InfluxDbHandler::sendToCloud(EnvironmentalData data)
+{
+    sendData("sensor_measurement", "temperature", data.temperature);
+    sendData("sensor_measurement", "humidity", data.humidity);
+    sendData("sensor_measurement", "pressure", data.pressure);
+    return 0;
+}
+
 int16_t InfluxDbHandler::sendData(const char *measurement_name, const char *type, float value)
 {
     if (!_client.connect(_host, _port))
-    {
         return -1;
-    }
 
     String lineProtocol = String(measurement_name) + " " + String(type) + "=" + String(value);
 
