@@ -6,13 +6,13 @@ const char *password = "friendlycanoe810";
 // const char *ssid = "MAMMUT";
 // const char *password = "cc$3+ckl.7.-RV";
 
-const char *influxdb_host = HOST;
+const char *influxdb_host = "192.168.1.22";
 const uint16_t influxdb_port = 8086;
 const char *influxdb_org = "huntabyte";
 const char *influxdb_bucket = "MyBucket";
 const char *influxdb_token = "0V_m85vb5WOviAJIDPjViPsA1Loa2UwnLYub6g_oXqmDUg6V3Hw_KE7vZ4B3LJvvOc9py6KrTEGuP8eHgVs2Ig==";
 
-const char *mqtt_broker = HOST;
+const char *mqtt_broker = "192.168.1.22";
 int mqtt_port = 1883;
 const char *mqtt_username = "your_mqtt_username";
 const char *mqtt_password = "your_mqtt_password";
