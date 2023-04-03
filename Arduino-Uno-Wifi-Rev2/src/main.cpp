@@ -39,8 +39,8 @@ static void messageReceived(String &topic, String &payload);
 static void errorMode(String error_message);
 static void errorMode(void);
 static void manualMode(String command);
-static void autoMode(void);
-static void collectData(void);
+static void autoMode(float temperature);
+static void collectData(float *temperature);
 static void PresentSensorDataOnSerialInterace(EnvironmentalData envData);
 
 /*=== Public Functions =======================================================*/
@@ -81,10 +81,11 @@ void loop()
   unsigned long currentMillis = millis();
   static unsigned long previousMillisDataCollection = 0;
   const unsigned long intervalDataCollection = 5000;
+  static float temperature = 20.0;
 
   if (currentMillis - previousMillisDataCollection >= intervalDataCollection)
   {
-    collectData();
+    collectData(&temperature);
     previousMillisDataCollection = currentMillis;
   }
 
@@ -102,8 +103,7 @@ void loop()
     break;
 
   case AUTO:
-    autoMode();
-
+    autoMode(temperature);
     break;
 
   default:
@@ -203,14 +203,25 @@ static void manualMode(String command)
 }
 
 /*-----------------------------------------------------------------*/
-static void autoMode(void)
+static void autoMode(float temperature)
 {
-  stepper.move(StepperHandler::FORWARD, 20000);
-  stepper.move(StepperHandler::BACKWARD, 20000);
+  if (temperature > 28.0 && windowState == WIN_CLOSED)
+  {
+    stepper.move(StepperHandler::FORWARD, 200000);
+    windowState = WIN_OPEN;
+    SERIAL.print("Temperature raised above 27°C");
+  }
+
+  if (temperature < 27.0 && windowState == WIN_OPEN)
+  {
+    stepper.move(StepperHandler::BACKWARD, 200000);
+    windowState = WIN_CLOSED;
+    SERIAL.print("Temperature fell below 26°C ");
+  }
 }
 
 /*-----------------------------------------------------------------*/
-static void collectData(void)
+static void collectData(float *tempeature_p)
 {
   EnvironmentalData envData = sensorHandler.collectSensorValues();
 
@@ -219,6 +230,8 @@ static void collectData(void)
 
   if (SERIAL)
     PresentSensorDataOnSerialInterace(envData);
+
+  *tempeature_p = envData.temperature;
 }
 
 /*-----------------------------------------------------------------*/
