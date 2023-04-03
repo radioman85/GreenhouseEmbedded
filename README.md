@@ -16,3 +16,6 @@ Use SCK, MOSI and MISO of the ICSP interface instead of D10 ... D13
 ![image](https://user-images.githubusercontent.com/25708993/229466985-0011e3c3-9bf6-434c-942e-5006addbeef8.png)
 
 
+### I2C
+Instead of using A4 (i.e. D18) and A5 (i.e. D19) use D20 for SDA and D21 for SCL.
+![image](https://user-images.githubusercontent.com/25708993/229468038-f914c920-033d-463b-8e65-342af5bd1806.png)
