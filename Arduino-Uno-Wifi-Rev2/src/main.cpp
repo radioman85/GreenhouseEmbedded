@@ -29,7 +29,7 @@ String command = "";
 MQTTClient mqtt;
 
 WINDOW_STATE_t windowState = WIN_CLOSED;
-WINDOW_CTRL_MODE_t windowCtrlMode = MANUAL;
+WINDOW_CTRL_MODE_t windowCtrlMode = AUTO;
 
 /*=== Private Function Prototypes ============================================*/
 static void welcomeScreen(void);
