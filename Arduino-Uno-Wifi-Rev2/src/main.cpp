@@ -96,10 +96,13 @@ void loop()
   else
     ;
 
+  stepper.init(); // Required, as mqtt_loop somehow deinit the stepper. To be investigated.
+
   switch (windowCtrlMode)
   {
   case MANUAL:
     manualMode(command);
+    command = "";
     break;
 
   case AUTO:
@@ -109,10 +112,8 @@ void loop()
   default:
     break;
   }
-  command = "";
 
   mqtt_loop(mqtt);
-  stepper.init(); // Required, as mqtt_loop somehow deinit the stepper. To be investigated.
 }
 
 /*=== Private Functions ======================================================*/
