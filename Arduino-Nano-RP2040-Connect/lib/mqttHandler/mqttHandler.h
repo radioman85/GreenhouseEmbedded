@@ -1,4 +1,3 @@
-// mqttHandler.h
 #ifndef MQTT_HANDLER_H
 #define MQTT_HANDLER_H
 

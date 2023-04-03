@@ -25,12 +25,11 @@ MQTTClient mqtt;
 
 /*=== Private Function Prototypes ============================================*/
 static void mySerialSender(const String &message);
+static void messageReceived(String &topic, String &payload);
 static void errorMode(String error_message);
 static void errorMode(void);
 static void PresentSensorDataOnSerialInterace(EnvironmentalData envData);
 static void IndicateSuccessfulSetupPhase(void);
-static void messageReceived(String &topic, String &payload);
-static void mySerialSender(const String &message);
 
 #include "mbed.h"
 #include "mbed_mem_trace.h"
