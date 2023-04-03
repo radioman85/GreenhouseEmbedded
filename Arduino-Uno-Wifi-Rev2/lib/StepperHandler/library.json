@@ -1,0 +1,17 @@
+{
+  "name": "StepperHandler",
+  "version": "1.0.0",
+  "authors": [
+    {
+      "name": "Niklas Roth",
+      "email": "nikicello@gmail.com"
+    }
+  ],
+  "description": "A library for handling stepper motors",
+  "dependencies": [
+    {
+      "name": "Ponoor_PowerSTEP01Library",
+      "version": "*"
+    }
+  ]
+}
