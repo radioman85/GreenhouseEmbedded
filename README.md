@@ -8,6 +8,11 @@ To gain some over engineering it will also connect to a local MQTT broker throuh
 This repo contains two hardware specific projects:
  - first: Arduino NANO RP2040 Connect. This ironically doesn't implement the stepper motor shield as it doesn't have that Arduion default interface. However, the purpose was simply to get know and test that board and the technologies of InfluxDB, MQTT and Docker.
  - second: Arduino UNO WIFI. This contains the entire system. I.e. sensor controlling, stepper motor controlling through MQTT subscribtion and tranfer of data to InfluxDB.
+
+## Hardware
+ - Arduino UNO WIFI (Rev2) (or Arduino NANO RP2040)
+ - X-NUCLEO-IHM03A1 Stepper Motor Shield (not very suitable for the NANO interface)
+ - BME688 Air Quality Sensor Shield (pimoroni.com)
  
 ## Faced Issues - Arduino UNO vs. Arduino UNO WIFI
 In contrary to the Arduino UNO (and Arduino NANO) the interfaces on the Arduino UNO WIFI are slightly different in respect to I2C and SPI. Using the SPI one has to use the ICSP interface and for I2C one has to use other ports.
