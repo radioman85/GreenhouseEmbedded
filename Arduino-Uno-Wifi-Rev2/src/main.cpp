@@ -79,16 +79,9 @@ void setup()
 
 void loop()
 {
-  unsigned long currentMillis = millis();
-  static unsigned long previousMillisDataCollection = 0;
-  const unsigned long intervalDataCollection = 5000;
   static float temperature = 20.0;
 
-  if (currentMillis - previousMillisDataCollection >= intervalDataCollection)
-  {
-    collectData(&temperature);
-    previousMillisDataCollection = currentMillis;
-  }
+  collectData(&temperature);
 
   if (command == "auto")
     windowCtrlMode = AUTO;
@@ -223,17 +216,25 @@ static void autoMode(float temperature)
 }
 
 /*-----------------------------------------------------------------*/
-static void collectData(float *tempeature_p)
+static void collectData(float *temperature_p)
 {
-  EnvironmentalData envData = sensorHandler.collectSensorValues();
+  unsigned long currentMillis = millis();
+  static unsigned long previousMillisDataCollection = currentMillis;
+  const unsigned long intervalDataCollection = 5000;
 
-  if (sensorHandler.sendToCloud(envData) < 0)
-    errorMode("Failed to send data to the cloud.");
+  if (currentMillis - previousMillisDataCollection >= intervalDataCollection)
+  {
+    previousMillisDataCollection = currentMillis;
+    EnvironmentalData envData = sensorHandler.collectSensorValues();
 
-  if (SERIAL)
-    PresentSensorDataOnSerialInterace(envData);
+    if (sensorHandler.sendToCloud(envData) < 0)
+      errorMode("Failed to send data to the cloud.");
 
-  *tempeature_p = envData.temperature;
+    if (SERIAL)
+      PresentSensorDataOnSerialInterace(envData);
+
+    *temperature_p = envData.temperature;
+  }
 }
 
 /*-----------------------------------------------------------------*/
