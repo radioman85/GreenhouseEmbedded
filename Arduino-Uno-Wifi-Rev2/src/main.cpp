@@ -176,22 +176,16 @@ static void manualMode(String command)
 {
   if (command == "open" && windowState == WIN_CLOSED)
   {
-    for (size_t i = 0; i < 8; i++)
-    {
-      delay(150);
-      digitalWrite(LED_BUILTIN, !digitalRead(LED_BUILTIN));
-    }
-    stepper.move(StepperHandler::FORWARD, 100000);
     windowState = WIN_OPEN;
+    SERIAL.println("*** Opening window *****************************************");
+    stepper.move(StepperHandler::FORWARD, 100000);
   }
 
   if (command == "close" && windowState == WIN_OPEN)
-    {
-      delay(300);
-      digitalWrite(LED_BUILTIN, !digitalRead(LED_BUILTIN));
-    }
-    stepper.move(StepperHandler::BACKWARD, 100000);
+  {
     windowState = WIN_CLOSED;
+    SERIAL.println("*** Closing window *****************************************");
+    stepper.move(StepperHandler::BACKWARD, 100000);
   }
 }
 
