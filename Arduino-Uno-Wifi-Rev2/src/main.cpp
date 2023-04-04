@@ -174,7 +174,7 @@ static void errorMode(void)
 /*-----------------------------------------------------------------*/
 static void manualMode(String command)
 {
-  if (command == "open" && windowState != WIN_OPEN)
+  if (command == "open" && windowState == WIN_CLOSED)
   {
     for (size_t i = 0; i < 8; i++)
     {
@@ -185,9 +185,7 @@ static void manualMode(String command)
     windowState = WIN_OPEN;
   }
 
-  if (command == "close" && windowState != WIN_CLOSED)
-  {
-    for (size_t i = 0; i < 4; i++)
+  if (command == "close" && windowState == WIN_OPEN)
     {
       delay(300);
       digitalWrite(LED_BUILTIN, !digitalRead(LED_BUILTIN));
