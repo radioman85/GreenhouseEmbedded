@@ -42,6 +42,7 @@ static void manualMode(String command);
 static void autoMode(float temperature);
 static void collectData(float *temperature);
 static void PresentSensorDataOnSerialInterace(EnvironmentalData envData);
+static void toggle(int pin);
 
 /*=== Public Functions =======================================================*/
 void setup()
@@ -252,4 +253,10 @@ static void PresentSensorDataOnSerialInterace(EnvironmentalData envData)
   SERIAL.print("Pressure: ");
   SERIAL.print(envData.pressure);
   SERIAL.println(" hPa");
+}
+
+/*-----------------------------------------------------------------*/
+static void toggle(int pin)
+{
+  digitalWrite(pin, !digitalRead(pin));
 }
