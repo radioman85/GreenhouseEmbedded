@@ -10,11 +10,18 @@ void connectMQTT(MQTTClient &mqtt, const char *mqtt_broker, int mqtt_port, const
     mqtt.begin(mqtt_broker, mqtt_port, wifiClient);
     mqtt.connect(mqtt_username, mqtt_password);
 
+    int numberOfTries = 0;
     while (!mqtt.connected())
     {
         delay(1000);
         if (messageSender)
             messageSender(".");
+
+        if (numberOfTries > 4)
+        {
+            messageSender("MQTT not connected.");
+            return;
+        }
     }
 
     if (messageSender)
