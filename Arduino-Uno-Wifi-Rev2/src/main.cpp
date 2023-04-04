@@ -200,18 +200,25 @@ static void manualMode(String command)
 /*-----------------------------------------------------------------*/
 static void autoMode(float temperature)
 {
-  if (temperature > 28.0 && windowState == WIN_CLOSED)
+  const float upperTempLimit = 28.0;
+  const float lowerTempLimit = 27.0;
+
+  if (temperature > upperTempLimit && windowState == WIN_CLOSED)
   {
     stepper.move(StepperHandler::FORWARD, 200000);
     windowState = WIN_OPEN;
-    SERIAL.print("Temperature raised above 27°C");
+    SERIAL.print("*** Temperature raised above");
+    SERIAL.print(upperTempLimit);
+    SERIAL.println("°C *************************************");
   }
 
-  if (temperature < 27.0 && windowState == WIN_OPEN)
+  if (temperature < lowerTempLimit && windowState == WIN_OPEN)
   {
     stepper.move(StepperHandler::BACKWARD, 200000);
     windowState = WIN_CLOSED;
-    SERIAL.print("Temperature fell below 26°C ");
+    SERIAL.print("*** Temperature fell below ");
+    SERIAL.print(lowerTempLimit);
+    SERIAL.println("°C *************************************");
   }
 }
 
