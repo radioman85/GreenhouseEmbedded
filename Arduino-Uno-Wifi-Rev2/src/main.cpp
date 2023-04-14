@@ -46,6 +46,7 @@ static void autoMode(float temperature);
 static void collectData(float *temperature);
 static void PresentSensorDataOnSerialInterace(EnvironmentalData envData);
 static void toggle(int pin);
+static void loopMqtt(void);
 
 /*=== Public Functions =======================================================*/
 void setup()
@@ -127,7 +128,7 @@ void loop()
   }
 
   if (wifiIsAvailable)
-    mqtt_loop();
+    loopMqtt();
 }
 
 /*=== Private Functions ======================================================*/
@@ -143,6 +144,21 @@ static void lifeSign(void)
     digitalWrite(LED_BUILTIN, HIGH); // turn the LED on (HIGH is the voltage level)
     delay(50);
     digitalWrite(LED_BUILTIN, LOW); // turn the LED off by making the voltage LOW
+    SERIAL.println("LED: I'm alive.");
+  }
+
+  static unsigned long previousMilliMqttStatus = currentMillis;
+  const unsigned long intervalMqttStatus = 5000;
+
+  if (currentMillis - previousMilliMqttStatus >= intervalMqttStatus)
+  {
+    previousMilliMqttStatus = currentMillis;
+
+    String _windowState = windowState == WIN_CLOSED ? "closed" : "open";
+    String _windowCtrlMode = windowCtrlMode == MANUAL ? "manual" : "auto";
+
+    mqtt_publish_system_status(mqtt, _windowState, _windowCtrlMode);
+    SERIAL.println("MQTT: I'm alive.");
   }
 }
 
@@ -325,4 +341,10 @@ static void PresentSensorDataOnSerialInterace(EnvironmentalData envData)
 static void toggle(int pin)
 {
   digitalWrite(pin, !digitalRead(pin));
+}
+
+/*-----------------------------------------------------------------*/
+static void loopMqtt(void)
+{
+  mqtt_loop(mqtt);
 }
