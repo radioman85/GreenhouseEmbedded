@@ -1,4 +1,5 @@
 #include "mqttHandler.h"
+#include <ArduinoJson.h>
 
 WiFiClient wifiClient;
 
@@ -15,9 +16,9 @@ void connectMQTT(MQTTClient &mqtt, const char *mqtt_broker, int mqtt_port, const
     {
         delay(1000);
         if (messageSender)
-            messageSender(".");
+            messageSender("mqtt...");
 
-        if (numberOfTries > 4)
+        if (numberOfTries++ > 4)
         {
             messageSender("MQTT not connected.");
             return;
@@ -42,4 +43,18 @@ void mqtt_loop(MQTTClient &mqtt)
 void mqtt_subscribe(MQTTClient &mqtt, const String &mqtt_topic)
 {
     mqtt.subscribe(mqtt_topic);
+}
+
+void mqtt_publish_system_status(MQTTClient &mqtt, const String &status, const String &mode)
+{
+    const char *topic = "balconygarden/greenhouse/windowdriver";
+
+    StaticJsonDocument<64> jsonDoc;
+    jsonDoc["status"] = status;
+    jsonDoc["mode"] = mode;
+
+    String payload;
+    serializeJson(jsonDoc, payload);
+
+    mqtt.publish(topic, payload);
 }
