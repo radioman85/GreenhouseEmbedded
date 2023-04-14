@@ -31,7 +31,10 @@ MQTTClient mqtt;
 WINDOW_STATE_t windowState = WIN_CLOSED;
 WINDOW_CTRL_MODE_t windowCtrlMode = AUTO;
 
+bool wifiIsAvailable = false;
+
 /*=== Private Function Prototypes ============================================*/
+static void lifeSign(void);
 static void welcomeScreen(void);
 static void IndicateSuccessfulSetupPhase(void);
 static void mySerialSender(const String &message);
@@ -59,18 +62,35 @@ void setup()
     errorMode("Communication with WiFi module failed!");
 
   WiFi.begin(ssid, password);
-  while (WiFi.status() != WL_CONNECTED)
+
+  uint16_t countWifi = 0;
+  while (true)
   {
+    if (WiFi.status() == WL_CONNECTED)
+    {
+      wifiIsAvailable = true;
+      SERIAL.println("Connected to WiFi. IP: ");
+      SERIAL.println("Trying to connect to target host ...");
+      SERIAL.println(WiFi.localIP());
+      break;
+    }
+
+    if (countWifi++ == 5)
+    {
+      wifiIsAvailable = false;
+      SERIAL.println("WiFi not connected");
+      break;
+    }
+
     delay(500);
     SERIAL.print("WiFi ...");
   }
 
-  SERIAL.println("Connected to WiFi. IP: ");
-  SERIAL.println("Trying to connect to target host ...");
-  SERIAL.println(WiFi.localIP());
-
-  mqtt_setup(mqtt, mqtt_broker, mqtt_port, mqtt_username, mqtt_password, messageReceived, mySerialSender);
-  mqtt_subscribe(mqtt, "balconygarden/greenhouse/window");
+  if (wifiIsAvailable)
+  {
+    mqtt_setup(mqtt, mqtt_broker, mqtt_port, mqtt_username, mqtt_password, messageReceived, mySerialSender);
+    mqtt_subscribe(mqtt, "balconygarden/greenhouse/window");
+  }
 
   stepper.init();
 
@@ -81,6 +101,7 @@ void loop()
 {
   static float temperature = 20.0;
 
+  lifeSign();
   collectData(&temperature);
 
   if (command == "auto")
@@ -89,8 +110,6 @@ void loop()
     windowCtrlMode = MANUAL;
   else
     ;
-
-  stepper.init(); // Required, as mqtt_loop somehow deinit the stepper. To be investigated.
 
   switch (windowCtrlMode)
   {
@@ -107,10 +126,27 @@ void loop()
     break;
   }
 
-  mqtt_loop(mqtt);
+  if (wifiIsAvailable)
+    mqtt_loop();
 }
 
 /*=== Private Functions ======================================================*/
+static void lifeSign(void)
+{
+  unsigned long currentMillis = millis();
+  static unsigned long previousMillisDataCollection = currentMillis;
+  const unsigned long intervalDataCollection = 2000;
+
+  if (currentMillis - previousMillisDataCollection >= intervalDataCollection)
+  {
+    previousMillisDataCollection = currentMillis;
+    digitalWrite(LED_BUILTIN, HIGH); // turn the LED on (HIGH is the voltage level)
+    delay(50);
+    digitalWrite(LED_BUILTIN, LOW); // turn the LED off by making the voltage LOW
+  }
+}
+
+/*-----------------------------------------------------------------*/
 static void welcomeScreen(void)
 {
   SERIAL.println("--- Stepper Motor: Welcome --------------------");
@@ -178,39 +214,53 @@ static void manualMode(String command)
   {
     windowState = WIN_OPEN;
     SERIAL.println("*** Opening window *****************************************");
+    stepper.init(); // Required, as mqtt_loop somehow deinit the stepper. To be investigated.
     stepper.move(StepperHandler::FORWARD, 100000);
+
+    mqtt_publish_system_status(mqtt, "open", "manual");
   }
 
   if (command == "close" && windowState == WIN_OPEN)
   {
     windowState = WIN_CLOSED;
     SERIAL.println("*** Closing window *****************************************");
+    stepper.init(); // Required, as mqtt_loop somehow deinit the stepper. To be investigated.
     stepper.move(StepperHandler::BACKWARD, 100000);
+
+    mqtt_publish_system_status(mqtt, "closed", "manual");
   }
 }
 
 /*-----------------------------------------------------------------*/
 static void autoMode(float temperature)
 {
-  const float upperTempLimit = 28.0;
-  const float lowerTempLimit = 27.0;
+  const float upperTempLimit = 31.0;
+  const float lowerTempLimit = 30.0;
 
   if (temperature > upperTempLimit && windowState == WIN_CLOSED)
   {
+    stepper.init(); // Required, as mqtt_loop somehow deinit the stepper. To be investigated.
     stepper.move(StepperHandler::FORWARD, 200000);
     windowState = WIN_OPEN;
     SERIAL.print("*** Temperature raised above");
     SERIAL.print(upperTempLimit);
     SERIAL.println("°C *************************************");
+
+    mqtt_publish_system_status(mqtt, "open", "auto");
+    return;
   }
 
   if (temperature < lowerTempLimit && windowState == WIN_OPEN)
   {
+    stepper.init(); // Required, as mqtt_loop somehow deinit the stepper. To be investigated.
     stepper.move(StepperHandler::BACKWARD, 200000);
     windowState = WIN_CLOSED;
     SERIAL.print("*** Temperature fell below ");
     SERIAL.print(lowerTempLimit);
     SERIAL.println("°C *************************************");
+
+    mqtt_publish_system_status(mqtt, "closed", "auto");
+    return;
   }
 }
 
@@ -221,18 +271,34 @@ static void collectData(float *temperature_p)
   static unsigned long previousMillisDataCollection = currentMillis;
   const unsigned long intervalDataCollection = 5000;
 
+  static unsigned long previousMillisDataPublishing = currentMillis;
+  const unsigned long intervalDataPublishing = 5000;
+
   if (currentMillis - previousMillisDataCollection >= intervalDataCollection)
   {
     previousMillisDataCollection = currentMillis;
     EnvironmentalData envData = sensorHandler.collectSensorValues();
 
-    if (sensorHandler.sendToCloud(envData) < 0)
-      errorMode("Failed to send data to the cloud.");
-
     if (SERIAL)
       PresentSensorDataOnSerialInterace(envData);
 
     *temperature_p = envData.temperature;
+  }
+
+  if (wifiIsAvailable)
+  {
+    if (currentMillis - previousMillisDataPublishing >= intervalDataPublishing)
+    {
+      previousMillisDataPublishing = currentMillis;
+      EnvironmentalData envData = sensorHandler.collectSensorValues();
+
+      if (sensorHandler.sendToCloud(envData) < 0)
+      {
+        if (SERIAL)
+          SERIAL.println("Failed to send data to the cloud");
+        // errorMode("Failed to send data to the cloud.");
+      }
+    }
   }
 }
 
