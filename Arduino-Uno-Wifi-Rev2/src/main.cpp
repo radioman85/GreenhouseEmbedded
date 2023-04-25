@@ -245,6 +245,30 @@ static void manualMode(String command)
 
     mqtt_publish_system_status(mqtt, "closed", "manual");
   }
+
+  if (command == "singleopen")
+  {
+    windowState = WIN_OPEN;
+    SERIAL.println("*** Single opening step ************************************");
+    stepper.init(); // Required, as mqtt_loop somehow deinit the stepper. To be investigated.
+    stepper.move(StepperHandler::FORWARD, 20000);
+  }
+
+  if (command == "singleclose" && windowState == WIN_OPEN)
+  {
+    SERIAL.println("*** Single closing step ************************************");
+    stepper.init(); // Required, as mqtt_loop somehow deinit the stepper. To be investigated.
+    stepper.move(StepperHandler::BACKWARD, 20000);
+  }
+
+  if (command == "setclose")
+  {
+    windowState = WIN_CLOSED;
+    SERIAL.println("*** Determined closed window********************************");
+    stepper.init(); // Required, as mqtt_loop somehow deinit the stepper. To be investigated.
+
+    mqtt_publish_system_status(mqtt, "closed", "manual");
+  }
 }
 
 /*-----------------------------------------------------------------*/
