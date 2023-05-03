@@ -1,8 +1,9 @@
 # BalkonWinterGarten
-
 ## About this repo
-This repo contains firmware the arduino plattform. It shall primerally controll a stepper motor using a X-NUCLEO-IHM03A1 shield depending on temperature, that is read from a BME680.
+This repo contains firmware for the arduino plattform. It primerally controlls a stepper motor using a X-NUCLEO-IHM03A1 shield depending on temperature, that is read from a BME680.
 To gain some over engineering it will also connect to a local MQTT broker throuh which the motor controlling can be influenced (i.e. Open, Close, Auto). It also sends environmental data to a local InfluxDB.
+
+![image](https://user-images.githubusercontent.com/25708993/235841975-c15c08b8-5a9b-4fec-9e87-d54ec7f6047d.png)
 
 ## Content
 This repo contains two hardware specific projects:
@@ -10,9 +11,9 @@ This repo contains two hardware specific projects:
  - second: Arduino UNO WIFI. This contains the entire system. I.e. sensor controlling, stepper motor controlling through MQTT subscribtion and tranfer of data to InfluxDB.
 
 ## Hardware
- - Arduino UNO WIFI (Rev2) (or Arduino NANO RP2040)
- - X-NUCLEO-IHM03A1 Stepper Motor Shield (not very suitable for the NANO interface)
- - BME688 Air Quality Sensor Shield (pimoroni.com)
+ - [Arduino UNO WIFI (Rev2)](https://ch.farnell.com/arduino/abx00021/entwicklungsboard-8-bit-avr-mcu/dp/2917573?ost=arduino+uno+wifi) (or Arduino NANO RP2040)
+ - [X-NUCLEO-IHM03A1 Stepper Motor Shield](https://ch.farnell.com/stmicroelectronics/x-nucleo-ihm03a1/erweiterungsboard-schrittmotortreiber/dp/2818309?ost=x-nucleo-ihm03a1) (not very suitable for the NANO interface)
+ - [BME688 Air Quality Sensor Shield (pimoroni.com)](https://ch.farnell.com/pimoroni/pim357/temperature-sensor-bme680-breakout/dp/3498490)
  
 ## Faced Issues - Arduino UNO vs. Arduino UNO WIFI
 In contrary to the Arduino UNO (and Arduino NANO) the interfaces on the Arduino UNO WIFI are slightly different in respect to I2C and SPI. Using the SPI one has to use the ICSP interface and for I2C one has to use other ports.
