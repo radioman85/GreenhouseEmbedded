@@ -6,8 +6,8 @@
 #define SERIAL Serial1
 #define SERIAL_BAUDRATE 115200
 
-const char *ssid = "NETGEAR16";
-const char *password = "friendlycanoe810";
+const char *ssid = "{your_ssid}";
+const char *password = "{your_password}";
 
 #define HOST "localhost"
 

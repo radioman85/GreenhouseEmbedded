@@ -1,10 +1,7 @@
 #define HOST "192.168.1.22"
 
-const char *ssid = "NETGEAR16";
-const char *password = "friendlycanoe810";
-
-// const char *ssid = "MAMMUT";
-// const char *password = "cc$3+ckl.7.-RV";
+const char *ssid = "your_ssid";
+const char *password = "{your_password}";
 
 const char *influxdb_host = "192.168.1.22";
 const uint16_t influxdb_port = 8086;
