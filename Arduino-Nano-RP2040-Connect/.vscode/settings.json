@@ -1,0 +1,7 @@
+{
+    "files.associations": {
+        "influxdbhandler": "c",
+        "stdint.h": "c",
+        "wifinina.h": "c"
+    }
+}

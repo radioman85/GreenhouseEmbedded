@@ -1,0 +1,21 @@
+{
+  "name": "influxDbHandler",
+  "version": "1.0.0",
+  "authors": [
+    {
+      "name": "Your Name",
+      "email": "your@email.com"
+    }
+  ],
+  "description": "A library for handling InfluxDB data",
+  "dependencies": [
+    {
+      "name": "WiFiNINA",
+      "version": "*"
+    },
+    {
+      "name": "Arduino",
+      "version": "*"
+    }
+  ]
+}

@@ -1,0 +1,21 @@
+{
+  "name": "sensorDataHandler",
+  "version": "1.0.0",
+  "authors": [
+    {
+      "name": "N. Roth",
+      "email": "nikicello@gmail.com"
+    }
+  ],
+  "description": "A library for handling sensor data",
+  "dependencies": [
+    {
+      "name": "Adafruit_Sensor",
+      "version": "*"
+    },
+    {
+      "name": "Adafruit_BME680",
+      "version": "*"
+    }
+  ]
+}
